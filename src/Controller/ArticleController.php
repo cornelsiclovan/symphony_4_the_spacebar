@@ -9,6 +9,7 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Repository\ArticleRepository;
 use App\Service\MarkdownHelper;
 use App\Service\SlackClient;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,29 +31,26 @@ class ArticleController extends AbstractController
     /**
      * @Route("/", name="app_homepage")
      */
-    public function homepage()
+    public function homepage(ArticleRepository $repository)
     {
-        return $this->render('article/homepage.html.twig');
+        $articles = $repository->findAllOrderedByNewest();
+
+        return $this->render('article/homepage.html.twig',
+                [
+                    'articles' => $articles,
+                ]
+            );
     }
 
     /**
      * @Route("/news/{slug}", name="article_show")
      */
-    public function show($slug, SlackClient $slack, EntityManagerInterface $em)
+    public function show(Article $article, SlackClient $slack)
     {
 
-        if($slug == 'khhaaan'){
+        if($article->getSlug() == 'khhaaan'){
             $slack->sendMessage('Kahn', 'Ah, Kirk, my old friend...');
         }
-
-        $repository = $em->getRepository(Article::class);
-
-        /** @var Article $article */
-        $article = $repository->findOneBy(['slug'=>$slug]);
-        if(!$article){
-            throw $this->createNotFoundException(sprintf('No article for slug "%s"', $slug));
-        }
-
 
 
         $comments = [
