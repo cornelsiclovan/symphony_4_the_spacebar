@@ -13,6 +13,11 @@ monolog:
         #chromephp:
         #    type: chromephp
         #    level: info
+        markdown_logging:
+                    type: stream
+                    path: "%kernel.logs_dir%/markdown.log"
+                    level: debug
+                    channels: ["markdown"]
         console:
             type:   console
             process_psr_3_messages: false
