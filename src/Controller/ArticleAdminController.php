@@ -10,24 +10,34 @@ namespace App\Controller;
 
 
 use App\Entity\Article;
+use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ArticleAdminController extends AbstractController
 {
     /**
-     * @Route("/admin/article/new")
+     * @Route("/admin/article")
      */
-    public function new(EntityManagerInterface $em){
-        die('todo');
+    public function show(ArticleRepository $articleRepository, Request $request, PaginatorInterface $paginator){
 
+        $q = $request->query->get('q');
+        $queryBuilder = $articleRepository->getWithSearchQueryBuilder($q);
 
-        return new Response(sprintf(
-            'Hiya! New article id: #%d slug: %s',
-            $article->getId(),
-            $article->getSlug()
-        ));
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            10
+        );
+
+        return $this->render('article_admin/homepage.html.twig',
+            [
+            'pagination' => $pagination
+            ]
+        );
     }
 }

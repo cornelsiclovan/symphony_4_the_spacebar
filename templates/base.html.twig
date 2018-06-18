@@ -40,7 +40,11 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="#">Profile</a>
                             <a class="dropdown-item" href="#">Create Post</a>
-                            <a class="dropdown-item" href="#">Logout</a>
+                            {% if is_granted('ROLE_USER')%}
+                                <a class="dropdown-item" href="{{ path('security_logout') }}">Logout</a>
+                            {% else %}
+                                <a class="dropdown-item" href="{{ path('security_login') }}">Login</a>
+                            {% endif %}
                         </div>
                     </li>
                 </ul>
